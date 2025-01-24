@@ -28,16 +28,19 @@
 //DONE
 // BONUS: Add another (nested) layout route that adds the <EventNavigation> component above all /events... page components
 //Done
-import {RouterProvider, createBrowserRouter} from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import HomePage from './pages/Home.js';
-import EventsPage from './pages/Events.js';
-import EventsDetailPage from './pages/EventDetail.js'
-import NewEventPage from './pages/NewEvent.js';
-import EditEventPage from './pages/EditEvent.js';
-import RootLayout from './pages/Root.js'
-import EventsRootLayout from './pages/eventsRoot.js';
-import { loader as eventsLoader } from './pages/Events.js';
+import HomePage from "./pages/Home.js";
+import EventsPage from "./pages/Events.js";
+import EventsDetailPage, {
+  loader as eventDetailsLoader,
+} from "./pages/EventDetail.js";
+import NewEventPage from "./pages/NewEvent.js";
+import EditEventPage from "./pages/EditEvent.js";
+import RootLayout from "./pages/Root.js";
+import EventsRootLayout from "./pages/eventsRoot.js";
+import ErrorPage from "./pages/Error.js";
+import { loader as eventsLoader } from "./pages/Events.js";
 
 const router = createBrowserRouter([
   {
@@ -48,11 +51,22 @@ const router = createBrowserRouter([
       {
         path: "events",
         element: <EventsRootLayout />,
+        errorElement: <ErrorPage />,
         children: [
           { index: true, element: <EventsPage />, loader: eventsLoader },
-          { path: ":eventId", element: <EventsDetailPage /> },
+          {
+            path: ":eventId",
+            id: "event-details",
+            loader: eventDetailsLoader,
+            children: [
+              {
+                index: true,
+                element: <EventsDetailPage />,
+              },
+              { path: "edit", element: <EditEventPage /> },
+            ],
+          },
           { path: "new", element: <NewEventPage /> },
-          { path: ":eventId/edit", element: <EditEventPage /> },
         ],
       },
     ],
@@ -60,8 +74,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-
-  return <RouterProvider router={router} />
+  return <RouterProvider router={router} />;
 }
 
 export default App;
